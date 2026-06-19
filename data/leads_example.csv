@@ -1,0 +1,6 @@
+lead_id,company_name,industry,contact_name,email,lead_source,city,state,priority,stage,estimated_value_usd,next_action
+LEAD-001,Silverline Sensors,Industrial IoT,Priya Shah,priya.shah@silverlinesensors.example,Conference,Seattle,WA,High,Discovery,42000,Schedule technical demo.
+LEAD-002,Evergreen Aero Systems,Aerospace,Daniel Wu,daniel.wu@evergreenaero.example,Website,Everett,WA,Medium,Qualified,68000,Send architecture overview and security notes.
+LEAD-003,Caldera Water Analytics,Environmental Monitoring,Sofia Martinez,sofia.martinez@calderawater.example,Referral,Denver,CO,High,Proposal,36000,Follow up on sample data ingestion requirements.
+LEAD-004,MetroFab Controls,Manufacturing,James O'Neill,james.oneill@metrofab.example,Cold Outreach,Cleveland,OH,Low,Nurture,18000,Check back after Q3 budget review.
+LEAD-005,Lantern Health Networks,Healthcare IT,Mei Tan,mei.tan@lanternhealth.example,Partner,Portland,OR,Medium,Discovery,52000,Confirm compliance and deployment constraints.

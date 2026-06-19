@@ -1,0 +1,197 @@
+# ==============================================================================
+# RAG Pipeline Configuration
+# This file controls all aspects of the Inveate project
+# Paths can be absolute or relative to this config file's location
+# ==============================================================================
+
+# --- PATHS & STORAGE ----------------------------------------------------------
+paths:
+  # Directory containing source documents for ingestion
+  source_dir: "./data"
+  
+  # ChromaDB persistent storage location
+  chroma_path: "./chroma_db"
+  
+  # Local models directory (embeddings, etc.)
+  local_models_dir: "./local_models"
+
+# --- APP INFO -----------------------------------------------------------------
+app:
+  name: "Inveate"
+  version: "0.1.0"
+
+# --- COLLECTION SETTINGS ------------------------------------------------------
+collection:
+  # Unique identifier for vector collection
+  name: "manual_rag_collection"
+  
+  # If true, clears existing vectors before ingest (use with caution in production)
+  reset_on_ingest: false
+  
+  # Version tag to help track data schema changes
+  version: "1.0.0"
+
+# --- DOCUMENT LOADER SETTINGS -------------------------------------------------
+loaders:
+  # File extensions to process during ingestion
+  enabled_extensions: 
+    - ".txt"
+    - ".csv"
+    - ".pdf"
+    - ".docx"
+    
+  # Custom parser settings (add more as needed)
+  pdf:
+    extraction_mode: "raw"  # Options: raw, layout, hybrid
+    extract_images: false
+    
+  csv:
+    delimiter: ","
+    header_row: true
+
+# --- CHUNKING STRATEGY --------------------------------------------------------
+chunking:
+  # Strategy options: recursive, fixed_size, token_based
+  strategy: "recursive"
+  
+  # Target chunk size in characters (adjust based on model context)
+  chunk_size: 900
+  
+  # Overlap between chunks to maintain context continuity
+  chunk_overlap: 150
+  
+  # Maximum characters per chunk hard limit
+  max_chunk_length: 2000
+
+# --- INGESTION SETTINGS -------------------------------------------------------
+
+  #controls how many chunks are written to ChromaDB per upsert operation. Larger values reduce Python/database overhead, but very large batches may increase memory use.
+  chroma_batch_size: 1000 
+  
+# --- EMBEDDING SETTINGS -------------------------------------------------------
+embedding:
+  provider: "sentence_transformers"
+  
+  # Local embedding model folder name under local_models_dir.
+  # Example: local_models/bge-large-en-v1.5
+  model_name: "bge-large-en-v1.5"
+  
+  # Device for embedding computation: cpu, cuda, mps
+  device: "cuda"
+  
+  #controls embedding model throughput and memory usage.
+  batch_size: 64
+  
+  # Enable normalization (improves similarity search accuracy)
+  normalize_embeddings: true
+
+# --- RETRIEVAL SETTINGS -------------------------------------------------------
+retrieval:
+  # Number of documents to fetch per query
+  top_k: 6
+  
+  # Minimum similarity score threshold (0.0 - 1.0, set to null for no filter)
+  min_similarity_score: null
+  
+  # Enable metadata filtering during retrieval
+  enable_metadata_filtering: false
+
+# --- CONTEXT WINDOW MANAGEMENT ------------------------------------------------
+context:
+  # Maximum tokens available in the system context window
+  max_system_context: 131072
+  
+  # Reserved tokens for model thinking/generation to prevent OOM
+  reserved_generation_tokens: 8000
+  
+  # Separator string between retrieved documents
+  separator: "\n---\n"
+  
+  # Enable token counting guardrail before sending to LLM
+  enable_guardrail: true
+
+# --- LM STUDIO / MODEL SERVER CONFIG ------------------------------------------
+lmstudio:
+  base_url: "http://localhost:1234/v1"
+  
+  # API key (set to null if not required by LM Studio config)
+  api_key: "lm-studio"
+  
+  # Model identifier as recognized by LM Studio
+  model: "gemma"
+  
+  # Temperature for generation creativity
+  temperature: 0.3
+  
+  # Maximum tokens the model can generate in response
+  max_gen_tokens: 2048
+  
+
+# --- SERVER CONFIGURATION -----------------------------------------------------
+server:
+  host: "127.0.0.1"
+  port: 8000
+  
+  # Response format: text/plain or application/json (for streaming)
+  stream_format: "text/plain"
+  
+  # Timeout for client requests in seconds
+  request_timeout_seconds: 300
+  
+  # Enable CORS if accessing from external browsers/applications
+  cors_enabled: false
+  
+  # API key protection for the server endpoint (optional)
+  api_key: null
+
+# --- CLIENT INTERFACE SETTINGS ------------------------------------------------
+client:
+  # Endpoint URL to send queries to
+  server_url: "http://127.0.0.1:8000/query"
+  
+  # Enable streaming responses in client output
+  stream: true
+  
+  # Connection timeout for HTTP requests
+  connection_timeout: 300
+
+# --- CHAT SESSION SETTINGS ----------------------------------------------------
+chat:
+  enabled: true
+  
+  # Maximum conversation turns before session reset (each turn = user + assistant)
+  max_turns: 12
+  
+  # Strip reasoning/thinking blocks from assistant output
+  strip_thinking_blocks: true
+  
+  # Thinking block markers - supports multiple patterns for different models
+  thinking_tags:
+    - start: "<think>"
+      end: "</think>"
+    - start: "<thought>"
+      end: "</thought>"
+  
+  # Persist conversation history to disk across sessions
+  persist_sessions: false
+  
+  # Session save path if persistence enabled
+  session_path: "./sessions/"
+
+# --- LOGGING CONFIGURATION ----------------------------------------------------
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  file_output: false
+  console_output: true
+  
+# --- ADVANCED SETTINGS (Use with caution) -------------------------------------
+advanced:
+  # Number of worker processes for ingestion
+  multiprocessing_workers: null  # null = auto-detect based on CPU cores
+  
+  # Enable verbose ChromaDB debugging
+  chroma_debug_mode: false
+  
+  # Custom token encoding (tiktoken, sentencepiece, etc.)
+  token_encoder: "cl100k_base"

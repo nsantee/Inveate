@@ -1,0 +1,6 @@
+customer_id,company_name,industry,contact_name,email,phone,city,state,status,annual_revenue_usd,notes
+CUST-001,Northstar Robotics,Industrial Automation,Elena Park,elena.park@northstarrobotics.example,555-0142,San Jose,CA,Active,1850000,Interested in edge AI monitoring for factory cells.
+CUST-002,Blue Ridge Medical Devices,Medical Devices,Marcus Hill,marcus.hill@blueridgemed.example,555-0198,Durham,NC,Active,3200000,Requires strict documentation and validation workflow.
+CUST-003,DesertGrid Energy,Renewable Energy,Aisha Romero,aisha.romero@desertgrid.example,555-0164,Phoenix,AZ,Prospect,950000,Evaluating local document search for field service manuals.
+CUST-004,HarborLine Logistics,Logistics,Victor Chen,victor.chen@harborline.example,555-0127,Long Beach,CA,Inactive,740000,Prior pilot paused due to internal IT review.
+CUST-005,Oak & Circuit Labs,Engineering Services,Nora Bennett,nora.bennett@oakcircuit.example,555-0113,Austin,TX,Active,1250000,Uses many PDF reports and CSV exports for customer projects.
