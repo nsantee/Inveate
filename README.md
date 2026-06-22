@@ -43,57 +43,105 @@ The parsing, normalization, chunking, embedding, retrieval, and model backend st
 
 ```mermaid
 flowchart LR
+    %% ============================================================
+    %% Ingest Module
+    %% ============================================================
     subgraph INGEST["Ingest Module"]
         docs["Source Documents<br/>TXT / CSV / PDF / DOCX"]
-        parse["Parsing Layer<br/>LangChain loaders"]
+
+        parse["Parsing Layer<br/>Current: LangChain loaders<br/>Future: Docling / custom parsers"]
+
         normalize["Normalize<br/>text + metadata"]
-        chunk["Chunking<br/>Recursive splitter"]
-        embed["Embedding<br/>SentenceTransformers"]
-        ids["Stable Chunk IDs<br/>source + page + hash"]
-        
-        docs --> parse --> normalize --> chunk --> embed
+
+        chunk["Chunking<br/>RecursiveCharacterTextSplitter<br/>size + overlap from config"]
+
+        embed["Embedding<br/>SentenceTransformers<br/>local BGE model"]
+
+        ids["Stable Chunk IDs<br/>source + page/doc + chunk + hash"]
+
+        docs --> parse
+        parse --> normalize
+        normalize --> chunk
+        chunk --> embed
         chunk --> ids
     end
 
+    %% ============================================================
+    %% Shared Local Storage
+    %% ============================================================
     subgraph STORAGE["Local Storage"]
-        chroma["ChromaDB<br/>persistent vector store"]
-        config["config.yaml<br/>centralized settings"]
+        chroma["ChromaDB<br/>persistent vector store<br/>vectors + text + metadata"]
+        config["config.yaml<br/>paths, parsing, chunking,<br/>embedding, retrieval, context, chat"]
     end
 
+    %% ============================================================
+    %% Application Server
+    %% ============================================================
     subgraph SERVER["Application Server"]
         fastapi["FastAPI<br/>/query + /health"]
-        retrieve["Retriever<br/>top-k search"]
-        context["Context Builder<br/>chunks + history"]
-        guardrail["Token Guardrail<br/>budgeting + trimming"]
-        prompt["Prompt Assembly<br/>system + RAG context"]
-        lmclient["AsyncOpenAI Client<br/>LM Studio API"]
 
-        fastapi --> retrieve --> context --> guardrail --> prompt --> lmclient
+        retrieve["Retriever<br/>ChromaDB top-k search"]
+
+        context["Context Builder<br/>retrieved chunks + chat history"]
+
+        guardrail["Token Guardrail<br/>context window budgeting + trimming"]
+
+        prompt["Prompt Assembly<br/>system prompt + history + RAG context"]
+
+        lmclient["AsyncOpenAI Client<br/>OpenAI-compatible LM Studio API"]
+
+        fastapi --> retrieve
+        retrieve --> context
+        context --> guardrail
+        guardrail --> prompt
+        prompt --> lmclient
     end
 
+    %% ============================================================
+    %% Client Chat
+    %% ============================================================
     subgraph CLIENT["Client Chat"]
         user["User"]
-        client["Terminal CLI<br/>streaming output"]
-        history["Local History<br/>turn memory + tag stripping"]
-        
-        user --> client <--> history
+
+        client["Terminal Chat Client<br/>streaming output"]
+
+        history["Local Chat History<br/>turn memory + thinking-tag stripping"]
+
+        user --> client
+        client <--> history
     end
 
+    %% ============================================================
+    %% LM Studio
+    %% ============================================================
     subgraph LMSTUDIO["LM Studio Model Server"]
         lmapi["OpenAI-Compatible API<br/>localhost:1234/v1"]
         llm["Local LLM<br/>Gemma / Qwen / Llama / etc."]
-        
+
         lmapi --> llm
     end
 
+    %% ============================================================
+    %% Cross-module flow
+    %% ============================================================
+
+    %% Ingest writes vector DB
     embed -->|"embeddings"| chroma
     ids -->|"IDs + metadata"| chroma
-    client -->|"HTTP POST /query"| fastapi
-    chroma -->|"retrieved chunks"| retrieve
+
+    %% Client talks to app server
+    client -->|"HTTP POST /query<br/>requests + streaming response"| fastapi
+
+    %% Server retrieves from storage
+    chroma -->|"retrieved chunks + metadata"| retrieve
+
+    %% Server talks to LM Studio
     lmclient -->|"chat.completions<br/>stream=true"| lmapi
     llm -->|"streamed tokens"| lmapi
-    lmapi -->|"FastAPI StreamingResponse"| client
-    
+    lmapi -->|"streamed tokens"| lmclient
+    lmclient -->|"FastAPI StreamingResponse"| client
+
+    %% Config influences all major modules
     config -.-> INGEST
     config -.-> SERVER
     config -.-> CLIENT
