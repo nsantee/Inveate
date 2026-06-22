@@ -1,0 +1,84 @@
+# ------------------------------------------------------------
+# Python cache/build artifacts
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+build/
+dist/
+
+# ------------------------------------------------------------
+# Virtual environments
+# ------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# ------------------------------------------------------------
+# Local configuration and secrets
+# ------------------------------------------------------------
+.env
+.env.*
+config.yaml
+
+# Keep this tracked:
+# config.example.yaml
+
+# ------------------------------------------------------------
+# Inveate runtime/generated data
+# ------------------------------------------------------------
+chroma_db/
+sessions/
+logs/
+*.log
+
+# Local knowledge files / user-ingested data
+data/
+massive_data_vault/
+
+# Keep example knowledge files tracked if desired:
+!examples/
+!examples/**
+!examples/sample_docs/
+!examples/sample_docs/**
+
+# ------------------------------------------------------------
+# Local embedding/model files
+# ------------------------------------------------------------
+local_models/
+models/
+
+# ------------------------------------------------------------
+# OS/editor files
+# ------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+
+# Optional: allow workspace recommendations/settings if you want later
+# !.vscode/extensions.json
+# !.vscode/settings.json
+
+# ------------------------------------------------------------
+# Jupyter / notebooks
+# ------------------------------------------------------------
+.ipynb_checkpoints/
+
+# ------------------------------------------------------------
+# Temporary files
+# ------------------------------------------------------------
+*.tmp
+*.bak
+*.swp
+*.swo
